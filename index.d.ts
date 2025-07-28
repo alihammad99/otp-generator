@@ -1,29 +1,32 @@
-declare module "otp-simple-generator" {
-  export interface GenerateResult {
-    success: boolean;
-    message: string;
-    otp?: string;
-    expire?: string;
-  }
-
-  export interface GetResult {
-    otp: string;
-    expire: string;
-  }
-
-  export interface VerifyResult {
-    success: boolean;
-    message: string;
-    arMessage: string;
-  }
-
-  const otp: {
-    generate(phone: string, length?: number, expire?: number): GenerateResult;
-
-    get(phone: string): GetResult | null;
-
-    verify(phone: string, otpCode: string): VerifyResult;
-  };
-
-  export default otp;
+export interface OtpData {
+  otp: number;
+  expire: Date;
+  phone: string;
 }
+
+export interface OtpResponseSuccess {
+  success: true;
+  message: string;
+  data?: OtpData;
+  arMessage?: string;
+}
+
+export interface OtpResponseFailure {
+  success: false;
+  message: string;
+  arMessage?: string;
+}
+
+export interface OtpService {
+  generate(phone: string, length?: number, expire?: number): OtpResponseSuccess;
+  verify(
+    phone: string,
+    otp: string | number
+  ): OtpResponseSuccess | OtpResponseFailure;
+}
+
+export function init(db: {
+  set(key: string, value: any): void;
+  get(key: string): any;
+  delete(key: string): void;
+}): OtpService;

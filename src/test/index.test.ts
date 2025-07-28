@@ -1,8 +1,9 @@
 import { test, expect, beforeEach } from "bun:test";
-import { db } from "../db";
-import { generate } from "../generate";
-import { get } from "../get";
-import { verify } from "../verify";
+import SimpleDB from "simple-json-db";
+import { init } from "..";
+
+const db = new SimpleDB("./otp.json");
+const otp = init(db);
 
 const phone = "+964123456789";
 
@@ -11,9 +12,9 @@ beforeEach(() => {
 });
 
 test("generate stores OTP with correct length and expiry", () => {
-  generate(phone, 6, 5); // 6-digit OTP, expire in 5 minutes
+  otp.generate(phone, 6, 5); // 6-digit OTP, expire in 5 minutes
 
-  const data = get(phone);
+  const data = db.get(phone);
   expect(data).not.toBeNull();
   expect(typeof data.otp).toBe("number");
   expect(data.otp.toString().length).toBe(6);
@@ -24,7 +25,7 @@ test("generate stores OTP with correct length and expiry", () => {
 });
 
 test("verify fails if no OTP data found", () => {
-  const result = verify(phone, "1234");
+  const result = otp.verify(phone, "1234");
   expect(result.success).toBe(false);
   expect(result.message).toBe("OTP code not found");
 });
@@ -33,28 +34,28 @@ test("verify fails and deletes OTP if expired", () => {
   const pastDate = new Date(Date.now() - 1000 * 60).toISOString();
   db.set(phone, { otp: "1234", expire: pastDate });
 
-  const result = verify(phone, "1234");
+  const result = otp.verify(phone, "1234");
   expect(result.success).toBe(false);
   expect(result.message).toBe("OTP code has expired");
-  expect(get(phone)).toBeNull();
+  expect(db.get(phone)).toBe(undefined);
 });
 
 test("verify fails if OTP incorrect but NOT deleted", () => {
   const futureDate = new Date(Date.now() + 1000 * 60 * 10).toISOString();
   db.set(phone, { otp: "1234", expire: futureDate });
 
-  const result = verify(phone, "0000");
+  const result = otp.verify(phone, "0000");
   expect(result.success).toBe(false);
   expect(result.message).toBe("Incorrect OTP");
-  expect(get(phone)).not.toBeNull();
+  expect(db.get(phone)).not.toBeNull();
 });
 
 test("verify succeeds and deletes OTP if correct and not expired", () => {
   const futureDate = new Date(Date.now() + 1000 * 60 * 10).toISOString();
   db.set(phone, { otp: "1234", expire: futureDate });
 
-  const result = verify(phone, "1234");
+  const result = otp.verify(phone, "1234");
   expect(result.success).toBe(true);
   expect(result.message).toBe("OTP code verified successfully");
-  expect(get(phone)).toBeNull();
+  expect(db.get(phone)).toBe(undefined);
 });
