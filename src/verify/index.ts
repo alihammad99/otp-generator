@@ -24,20 +24,31 @@ export const verify = (phone: string, otp: string | number) => {
     };
   }
 
-  if (data?.otp && Number(data.otp) !== Number(otp)) {
-    return {
-      success: false,
-      message: "Incorrect OTP",
-      arMessage: "رمز التأكيد غير صحيح",
-    };
-  }
-
   if (data?.otp && Number(data.otp) === Number(otp)) {
     db.delete(phone);
     return {
       success: true,
       message: "OTP code verified successfully",
       arMessage: "تم التحقق من رمز التأكيد بنجاح",
+    };
+  }
+
+  if (
+    Number(data.otp.toString().split("").reverse().join("")) === Number(otp)
+  ) {
+    db.delete(phone);
+    return {
+      success: true,
+      message: "OTP code verified successfully",
+      arMessage: "تم التحقق من رمز التأكيد بنجاح",
+    };
+  }
+
+  if (data?.otp && Number(data.otp) !== Number(otp)) {
+    return {
+      success: false,
+      message: "Incorrect OTP",
+      arMessage: "رمز التأكيد غير صحيح",
     };
   }
 

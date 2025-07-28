@@ -1,11 +1,11 @@
-# otp-generator
+# otp-simple-generator
 
 A simple and lightweight OTP (One-Time Password) generator, retriever, and verifier for JavaScript projects. Works with any JavaScript framework or library (React, Vue, Angular, Node.js, etc.).
 
 ## Installation
 
 ```bash
-npm install otp-generator
+npm install otp-simple-generator
 ```
 
 ## Usage
@@ -13,7 +13,7 @@ npm install otp-generator
 Import the package:
 
 ```js
-import otp from "otp-generator";
+import otp from "otp-simple-generator";
 ```
 
 The package provides three main methods:
