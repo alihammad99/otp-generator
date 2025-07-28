@@ -1,0 +1,25 @@
+{
+  "name": "otp-generator",
+  "version": "1.0.0",
+  "description": "OTP Codes generator and verifier",
+  "keywords": [
+    "OTPIQ",
+    "OTP"
+  ],
+  "license": "ISC",
+  "author": "Ali Hammad",
+  "type": "commonjs",
+  "main": "lib/src/index.ts",
+  "scripts": {
+    "test": "bun test",
+    "build": "bun build src/index.ts --outdir dist --minify"
+  },
+  "dependencies": {
+    "simple-json-db": "^2.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ]
+}
